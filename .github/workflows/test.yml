@@ -1,0 +1,78 @@
+name: Autograde
+
+# Runs the test suite on every push so graders see a pass/fail at a glance.
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        id: tests
+        run: dart test --reporter json > test-results.json
+
+      - name: Write grading summary
+        if: always()
+        run: |
+          if [ ! -s test-results.json ]; then
+            echo "## ❌ Tests did not run (build/install error)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          cat > summary.dart <<'EOF'
+          import 'dart:convert';
+          import 'dart:io';
+
+          void main() {
+            final names = <int, String>{};
+            final results = <int, String>{};
+            final hidden = <int>{};
+            for (final line in File('test-results.json').readAsLinesSync()) {
+              if (line.trim().isEmpty) continue;
+              dynamic e;
+              try {
+                e = jsonDecode(line);
+              } catch (_) {
+                continue;
+              }
+              if (e is! Map) continue;
+              switch (e['type']) {
+                case 'testStart':
+                  final t = e['test'] as Map;
+                  names[t['id'] as int] = t['name'] as String;
+                  break;
+                case 'testDone':
+                  results[e['testID'] as int] = e['result'] as String;
+                  if (e['hidden'] == true) hidden.add(e['testID'] as int);
+                  break;
+              }
+            }
+            final ids =
+                names.keys.where((id) => !hidden.contains(id)).toList();
+            final passed =
+                ids.where((id) => results[id] == 'success').length;
+            final total = ids.length;
+            final out = StringBuffer();
+            out.writeln(
+                '## ${passed == total && total > 0 ? '✅' : '❌'} $passed / $total tests passed');
+            out.writeln();
+            out.writeln('| Result | Test |');
+            out.writeln('| --- | --- |');
+            for (final id in ids) {
+              final icon = results[id] == 'success' ? '✅' : '❌';
+              out.writeln('| $icon | ${names[id]} |');
+            }
+            stdout.write(out.toString());
+          }
+          EOF
+          dart summary.dart >> "$GITHUB_STEP_SUMMARY"
