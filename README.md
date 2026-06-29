@@ -96,3 +96,36 @@ Pushing triggers the **Autograde** workflow. Confirm your submission landed:
 1. Open your repo on GitHub and click the **Actions** tab.
 2. Open the latest **Autograde** run and confirm the green ✅ check
    and the "5 / 5 tests passed" summary.
+
+## 💻 Work in a Codespace (recommended)
+
+A **Codespace** is a complete dev environment that runs in the cloud, so you do
+not have to install Node, Dart, or anything else on your own laptop. This repo is
+already configured: open a Codespace and everything you need is ready.
+
+**Open one:** click the green **Code** button → **Codespaces** tab → **Create
+codespace on main**. The first launch takes a minute to set up; after that it is
+instant. Then run the activity from its terminal exactly as described below.
+
+**Use it in VS Code (recommended).** It works in the browser, but it is nicer in
+the desktop app: install the **GitHub Codespaces** extension in VS Code, or from
+the running Codespace click the menu (☰) → **Open in VS Code Desktop**. Same
+environment, your own editor.
+
+### ⏱️ Make your free hours last (please read)
+Your GitHub Education account includes a generous but limited monthly Codespaces
+allowance. Three habits keep you from wasting it:
+
+1. **Set your idle timeout to 10 minutes.** Go to
+   **github.com/settings/codespaces → Default idle timeout → 10 minutes → Save.**
+   A Codespace keeps running (and spending your hours) when you walk away; this
+   makes it auto-stop after 10 idle minutes.
+2. **Stop it when you finish - don't just close the tab.** Closing the browser
+   leaves it running. Stop it at **github.com/codespaces → ••• → Stop
+   codespace**, or from inside the editor open the **Command Palette**
+   (`Ctrl`/`Cmd`+`Shift`+`P`, or **F1**) and run
+   *Codespaces: Stop Current Codespace*.
+3. **Delete the Codespace once you've submitted this activity.** Every activity
+   gets its own Codespace, so old ones pile up and use your storage. After your
+   final push: **github.com/codespaces → ••• → Delete.** You can always recreate
+   it later from the green **Code** button.
