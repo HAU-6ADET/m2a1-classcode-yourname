@@ -1,0 +1,14 @@
+{
+  "name": "HAU Codespace (Dart)",
+  "image": "dart:stable",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "postCreateCommand": "if [ -f pubspec.yaml ]; then dart pub get; fi",
+  "customizations": {
+    "vscode": {
+      "extensions": ["Dart-Code.dart-code"]
+    }
+  }
+}
