@@ -1,6 +1,6 @@
 # Set up your M2A1 activity
 
-You need Git, Visual Studio Code and an internet connection. Install Dart 3.11.5 or newer within Dart 3. The launcher downloads a private copy of GitHub CLI on Mac and Windows when it is missing, with no admin rights needed.
+You need Git, Visual Studio Code and an internet connection. Install Dart 3.11.5 or newer within Dart 3. The launcher downloads a private copy of GitHub CLI when it is missing, with no admin rights needed.
 
 ## Create your private activity repo
 
@@ -10,13 +10,21 @@ Name your repo `m2a1-CLASSCODE-USERNAME`. Replace CLASSCODE with the numeric cla
 
 ## Download and start the launcher
 
-On Mac, open **Terminal**. On Windows, open **Git Bash** from Git for Windows (not Command Prompt or PowerShell). Paste this one command and press Enter. It downloads the launcher into your home folder and starts it, so you do not need to find your Downloads folder.
+Use the launcher for your computer. Each one downloads GitHub CLI if needed, with no admin rights.
+
+**Mac:** open **Terminal**, paste this command and press Enter.
 
 ```bash
-cd ~ && curl -fsSLO https://raw.githubusercontent.com/HAU-6ADET/m2a1-classcode-yourname/main/start-activity.sh && bash start-activity.sh
+cd ~ && curl -fsSLO https://raw.githubusercontent.com/HAU-6ADET/m2a1-classcode-yourname/main/start-activity-mac.sh && bash start-activity-mac.sh
 ```
 
-If the lab blocks that download, open [start-activity.sh](start-activity.sh) on GitHub, choose **Download raw file**, then in the terminal type `cd `, drag the folder that holds the file into the terminal window, press Enter, and run `bash start-activity.sh`. Enter your GitHub username, name and GitHub commit email when asked. The launcher opens a fresh VS Code profile and leaves a terminal prompt in the new work folder. It downloads GitHub CLI if needed, opens the GitHub browser sign-in, checks that the signed-in account matches the username you entered, and gives Git a temporary credential helper for this launch. Do not type a GitHub password or token into Git.
+**Windows:** open **Windows PowerShell** from the Start menu (not Git Bash or Command Prompt), paste this command and press Enter.
+
+```powershell
+irm https://raw.githubusercontent.com/HAU-6ADET/m2a1-classcode-yourname/main/start-activity-windows.ps1 | iex
+```
+
+Enter your GitHub username, name and GitHub commit email when asked. The launcher opens a fresh VS Code profile and leaves a terminal prompt in the new work folder. It downloads GitHub CLI if needed, opens the GitHub browser sign-in, checks that the signed-in account matches the username you entered, and gives Git a temporary credential helper for this launch. Do not type a GitHub password or token into Git.
 
 ## Clone and check your Git setup
 
@@ -38,6 +46,6 @@ git status --short --branch && git remote -v && git var GIT_AUTHOR_IDENT
 
 The first line should show your branch. The fetch and push URLs should point to your private repo in **HAU-6ADET**. The last line should show your own name and commit email. If it shows someone else's details, return to the launcher terminal or the new VS Code window and check again. The command checks local wiring. A successful VS Code clone confirms read access, and a successful push confirms write access.
 
-Use VS Code **Source Control** to commit and push on the lab computer. Check your new commit on GitHub before submitting its URL. At the end of class, close the VS Code window, type `exit` in the launcher terminal so its temporary credential is removed, and sign out of GitHub in the browser. Your local files remain in the work folder.
+Use VS Code **Source Control** to commit and push on the lab computer. Check your new commit on GitHub before submitting its URL. At the end of class, close the VS Code window, type `exit` in the launcher terminal or PowerShell window so its temporary credential is removed, and sign out of GitHub in the browser. Your local files remain in the work folder.
 
 Continue with the [activity instructions](README.md).
