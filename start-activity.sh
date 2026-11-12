@@ -8,70 +8,68 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 
 ensure_gh() {
+  local tools_bin="$HOME/HAU-Activities/.tools/bin" os arch exe=gh asset_os
+  case "$(uname -s)" in
+    Darwin*) os=mac; asset_os=macOS ;;
+    MINGW*|MSYS*|CYGWIN*) os=windows; asset_os=windows; exe=gh.exe ;;
+    *) os=other ;;
+  esac
+  export PATH="$tools_bin:$PATH"
+  if [[ $os == windows ]]; then
+    # winget and the MSI install gh where an already-open Git Bash cannot see it yet.
+    for dir in "/c/Program Files/GitHub CLI" "${LOCALAPPDATA:+$(cygpath -u "$LOCALAPPDATA")/Microsoft/WinGet/Links}" "${LOCALAPPDATA:+$(cygpath -u "$LOCALAPPDATA")/Programs/GitHub CLI}"; do
+      [[ -n "$dir" && -x "$dir/gh.exe" ]] && export PATH="$PATH:$dir"
+    done
+  fi
+  hash -r 2>/dev/null || true
   if command -v gh >/dev/null 2>&1; then
     return
   fi
-
-  case "$(uname -s)" in
-    Darwin*)
-      tools_bin="$HOME/HAU-Activities/.tools/bin"
-      mkdir -p "$tools_bin"
-      if [[ -x "$tools_bin/gh" ]]; then
-        export PATH="$tools_bin:$PATH"
-        return
-      fi
-      if ! command -v curl >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
-        printf '%s\n' 'curl and unzip are required to download GitHub CLI. Ask your instructor to prepare this Mac.' >&2
-        exit 1
-      fi
-      case "$(uname -m)" in
-        arm64|aarch64) gh_arch=arm64 ;;
-        x86_64|amd64) gh_arch=amd64 ;;
-        *) printf 'Unsupported Mac architecture: %s\n' "$(uname -m)" >&2; exit 1 ;;
-      esac
-      latest_json=$(curl -fsSL -H 'Accept: application/vnd.github+json' https://api.github.com/repos/cli/cli/releases/latest)
-      gh_version=$(printf '%s' "$latest_json" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\([^"]*\)".*/\1/p' | head -n 1)
-      if [[ -z "$gh_version" ]]; then
-        printf '%s\n' 'Could not determine the current GitHub CLI release.' >&2
-        exit 1
-      fi
-      download_dir=$(mktemp -d "${TMPDIR:-/tmp}/hau-gh.XXXXXX")
-      archive="$download_dir/gh.zip"
-      gh_url="https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_macOS_${gh_arch}.zip"
-      printf 'GitHub CLI is not installed. Downloading the official release...\n'
-      if ! curl -fL --silent --show-error "$gh_url" -o "$archive"; then
-        rm -rf -- "$download_dir"
-        printf '%s\n' 'GitHub CLI download failed. Ask your instructor to prepare this Mac.' >&2
-        exit 1
-      fi
-      unzip -q "$archive" -d "$download_dir"
-      gh_binary=$(find "$download_dir" -type f -path '*/bin/gh' -print -quit)
-      if [[ -z "$gh_binary" ]]; then
-        rm -rf -- "$download_dir"
-        printf '%s\n' 'The GitHub CLI download did not contain its executable.' >&2
-        exit 1
-      fi
-      cp "$gh_binary" "$tools_bin/gh"
-      chmod 755 "$tools_bin/gh"
-      rm -rf -- "$download_dir"
-      export PATH="$tools_bin:$PATH"
-      ;;
-    MINGW*|MSYS*)
-      if command -v winget.exe >/dev/null 2>&1; then
-        printf '%s\n' 'GitHub CLI is not installed. Installing it for this Windows user...'
-        winget.exe install --id GitHub.cli --exact --scope user --accept-source-agreements --accept-package-agreements
-        hash -r 2>/dev/null || true
-      fi
-      if ! command -v gh >/dev/null 2>&1; then
-        printf '%s\n' 'GitHub CLI is required for automatic sign-in. Install it from https://cli.github.com/ or ask your instructor to prepare this PC.' >&2
-        exit 1
-      fi
-      ;;
-    *)
-      printf '%s\n' 'GitHub CLI is required for automatic sign-in. Install it from https://cli.github.com/ or ask your instructor to prepare this computer.' >&2
-      exit 1
-      ;;
+  if [[ $os == other ]]; then
+    printf '%s\n' 'GitHub CLI is required for automatic sign-in. Install it from https://cli.github.com/ or ask your instructor to prepare this computer.' >&2
+    exit 1
+  fi
+  if ! command -v curl >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
+    printf '%s\n' 'curl and unzip are required to download GitHub CLI. Ask your instructor to prepare this computer.' >&2
+    exit 1
+  fi
+  case "$(uname -m)" in
+    arm64|aarch64) arch=arm64 ;;
+    *) arch=amd64 ;;
   esac
+  # Read the version from the release redirect, not the API: a lab shares one
+  # address, and the unauthenticated API allows only 60 requests an hour.
+  latest=$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/cli/cli/releases/latest) || latest=""
+  gh_version=${latest##*/v}
+  if [[ -z "$latest" || -z "$gh_version" || "$gh_version" == "$latest" ]]; then
+    printf '%s\n' 'Could not reach GitHub to download GitHub CLI. Check the internet connection and run the launcher again.' >&2
+    exit 1
+  fi
+  download_dir=$(mktemp -d "${TMPDIR:-/tmp}/hau-gh.XXXXXX")
+  gh_url="https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_${asset_os}_${arch}.zip"
+  printf 'GitHub CLI is not installed. Downloading GitHub CLI %s (no admin rights needed)...\n' "$gh_version"
+  if ! curl -fL --silent --show-error "$gh_url" -o "$download_dir/gh.zip"; then
+    rm -rf -- "$download_dir"
+    printf '%s\n' 'GitHub CLI download failed. Check the internet connection and run the launcher again.' >&2
+    exit 1
+  fi
+  unzip -q "$download_dir/gh.zip" -d "$download_dir"
+  gh_binary=$(find "$download_dir" -type f -path "*/bin/$exe" -print -quit)
+  if [[ -z "$gh_binary" ]]; then
+    rm -rf -- "$download_dir"
+    printf '%s\n' 'The GitHub CLI download did not contain its executable.' >&2
+    exit 1
+  fi
+  mkdir -p "$tools_bin"
+  cp "$gh_binary" "$tools_bin/$exe"
+  chmod 755 "$tools_bin/$exe"
+  rm -rf -- "$download_dir"
+  hash -r 2>/dev/null || true
+  if ! command -v gh >/dev/null 2>&1; then
+    printf '%s\n' 'GitHub CLI was downloaded but cannot run. Ask your instructor to check this computer.' >&2
+    exit 1
+  fi
+  printf 'GitHub CLI is ready: %s\n' "$(gh --version | head -n 1)"
 }
 
 ensure_gh

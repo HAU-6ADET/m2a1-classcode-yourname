@@ -1,6 +1,6 @@
 # Set up your M2A1 activity
 
-You need Git, Visual Studio Code and an internet connection. Install Dart 3.11.5 or newer within Dart 3. The launcher downloads a private copy of GitHub CLI on macOS when it is missing. On Windows it uses `winget` when available.
+You need Git, Visual Studio Code and an internet connection. Install Dart 3.11.5 or newer within Dart 3. The launcher downloads a private copy of GitHub CLI on Mac and Windows when it is missing, with no admin rights needed.
 
 ## Create your private activity repo
 
@@ -10,14 +10,13 @@ Name your repo `m2a1-CLASSCODE-USERNAME`. Replace CLASSCODE with the numeric cla
 
 ## Download and start the launcher
 
-**Download [start-activity.sh](start-activity.sh) before cloning.** Open the file on the GitHub template, click **Download raw file**, and save it in Downloads as `start-activity.sh`. On Mac, open **Terminal**. On Windows, open **Git Bash** from Git for Windows. Run these commands from that standalone terminal.
+On Mac, open **Terminal**. On Windows, open **Git Bash** from Git for Windows (not Command Prompt or PowerShell). Paste this one command and press Enter. It downloads the launcher into your home folder and starts it, so you do not need to find your Downloads folder.
 
 ```bash
-cd "$HOME/Downloads"
-bash ./start-activity.sh
+cd ~ && curl -fsSLO https://raw.githubusercontent.com/HAU-6ADET/m2a1-classcode-yourname/main/start-activity.sh && bash start-activity.sh
 ```
 
-If you saved it elsewhere, change into that folder first. Enter your GitHub username, name and GitHub commit email when asked. The launcher opens a fresh VS Code profile and leaves a terminal prompt in the new work folder. It downloads GitHub CLI if needed, opens the GitHub browser sign-in, checks that the signed-in account matches the username you entered, and gives Git a temporary credential helper for this launch. Do not type a GitHub password or token into Git.
+If the lab blocks that download, open [start-activity.sh](start-activity.sh) on GitHub, choose **Download raw file**, then in the terminal type `cd `, drag the folder that holds the file into the terminal window, press Enter, and run `bash start-activity.sh`. Enter your GitHub username, name and GitHub commit email when asked. The launcher opens a fresh VS Code profile and leaves a terminal prompt in the new work folder. It downloads GitHub CLI if needed, opens the GitHub browser sign-in, checks that the signed-in account matches the username you entered, and gives Git a temporary credential helper for this launch. Do not type a GitHub password or token into Git.
 
 ## Clone and check your Git setup
 
