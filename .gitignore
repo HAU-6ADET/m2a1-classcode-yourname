@@ -1,0 +1,7 @@
+.dart_tool/
+.packages
+build/
+coverage/
+.env
+.env.*
+.DS_Store

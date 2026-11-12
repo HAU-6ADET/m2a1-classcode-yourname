@@ -1,0 +1,14 @@
+{
+  "name": "ADET M2A1 - Dart",
+  "image": "dart:stable",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "postCreateCommand": "dart pub get",
+  "customizations": {
+    "vscode": {
+      "extensions": ["Dart-Code.dart-code"]
+    }
+  }
+}
