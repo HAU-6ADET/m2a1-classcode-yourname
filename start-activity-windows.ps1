@@ -66,7 +66,7 @@
   $ghConfig = Join-Path $env:TEMP "hau-activity-gh-$suffix"
   New-Item -ItemType Directory -Force -Path $workspace, $profileDir, $ghConfig | Out-Null
 
-  $names = 'GH_CONFIG_DIR','GIT_CONFIG_GLOBAL','GIT_CONFIG_NOSYSTEM','GIT_CONFIG_COUNT','GIT_CONFIG_KEY_0','GIT_CONFIG_VALUE_0','GIT_CONFIG_KEY_1','GIT_CONFIG_VALUE_1','GIT_CONFIG_KEY_2','GIT_CONFIG_VALUE_2','GIT_CONFIG_KEY_3','GIT_CONFIG_VALUE_3','GIT_CONFIG_KEY_4','GIT_CONFIG_VALUE_4'
+  $names = 'GH_CONFIG_DIR','GIT_CONFIG_GLOBAL','GIT_CONFIG_NOSYSTEM','GIT_CONFIG_COUNT','GIT_CONFIG_KEY_0','GIT_CONFIG_VALUE_0','GIT_CONFIG_KEY_1','GIT_CONFIG_VALUE_1','GIT_CONFIG_KEY_2','GIT_CONFIG_VALUE_2','GIT_CONFIG_KEY_3','GIT_CONFIG_VALUE_3'
   try {
     foreach ($n in 'GIT_CONFIG_PARAMETERS','GIT_CONFIG_SYSTEM','GIT_ASKPASS','SSH_ASKPASS','GH_TOKEN','GITHUB_TOKEN','GIT_DIR','GIT_WORK_TREE','GIT_AUTHOR_NAME','GIT_AUTHOR_EMAIL','GIT_COMMITTER_NAME','GIT_COMMITTER_EMAIL') { Remove-Item "Env:$n" -ErrorAction SilentlyContinue }
     $env:GH_CONFIG_DIR = $ghConfig
@@ -77,12 +77,13 @@
     if ($account.ToLower() -ne $username.ToLower()) { Fail "The signed-in GitHub account is $account, but you entered $username. Sign out in the browser and run the launcher again." }
 
     $helper = '!"' + ($ghPath -replace '\\','/') + '" auth git-credential'
-    $env:GIT_CONFIG_GLOBAL = 'NUL'; $env:GIT_CONFIG_NOSYSTEM = '1'; $env:GIT_CONFIG_COUNT = '5'
-    $env:GIT_CONFIG_KEY_0 = 'credential.helper'; $env:GIT_CONFIG_VALUE_0 = ''
-    $env:GIT_CONFIG_KEY_1 = 'credential.helper'; $env:GIT_CONFIG_VALUE_1 = $helper
-    $env:GIT_CONFIG_KEY_2 = 'user.name'; $env:GIT_CONFIG_VALUE_2 = $author
-    $env:GIT_CONFIG_KEY_3 = 'user.email'; $env:GIT_CONFIG_VALUE_3 = $email
-    $env:GIT_CONFIG_KEY_4 = 'credential.https://github.com.username'; $env:GIT_CONFIG_VALUE_4 = $username
+    # PowerShell deletes a variable set to '', so no entry may have an empty value.
+    # NUL global config and no system config already leave no inherited helper.
+    $env:GIT_CONFIG_GLOBAL = 'NUL'; $env:GIT_CONFIG_NOSYSTEM = '1'; $env:GIT_CONFIG_COUNT = '4'
+    $env:GIT_CONFIG_KEY_0 = 'credential.helper'; $env:GIT_CONFIG_VALUE_0 = $helper
+    $env:GIT_CONFIG_KEY_1 = 'user.name'; $env:GIT_CONFIG_VALUE_1 = $author
+    $env:GIT_CONFIG_KEY_2 = 'user.email'; $env:GIT_CONFIG_VALUE_2 = $email
+    $env:GIT_CONFIG_KEY_3 = 'credential.https://github.com.username'; $env:GIT_CONFIG_VALUE_3 = $username
 
     Write-Host "`nWork folder: $workspace"
     Write-Host 'In this window, run this command with your own private repository URL:'
