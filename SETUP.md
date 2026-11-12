@@ -29,22 +29,35 @@ Enter your GitHub username, name and GitHub commit email when asked. The launche
 ## Clone and check your Git setup
 
 1. On GitHub, open your **private activity repo**. Click **Code → HTTPS** and copy the clone URL.
-2. In the terminal opened by the launcher, run the clone command. Replace the URL with your own copied URL.
+2. In the terminal or PowerShell window the launcher left open, type each command below on its own line and press Enter after each one. Replace the URL with your own copied URL.
 
 ```bash
 git clone https://github.com/HAU-6ADET/m2a1-CLASSCODE-USERNAME.git
+```
+
+3. Move into the folder the clone just made. It has the same name as your repo:
+
+```bash
 cd m2a1-CLASSCODE-USERNAME
+```
+
+Check that the prompt now ends with that folder name. Every command from here on runs inside it. Then open it in VS Code:
+
+```bash
 code .
 ```
 
 GitHub is already authenticated by the launcher. If a Git prompt asks for a password or token, cancel it and rerun the launcher.
-3. In the terminal inside the cloned folder, paste this check.
+
+4. Still inside the cloned folder, run these three checks one at a time. Windows PowerShell does not accept `&&`, so do not join them into one line.
 
 ```bash
-git status --short --branch && git remote -v && git var GIT_AUTHOR_IDENT
+git status --short --branch
+git remote -v
+git var GIT_AUTHOR_IDENT
 ```
 
-The first line should show your branch. The fetch and push URLs should point to your private repo in **HAU-6ADET**. The last line should show your own name and commit email. If it shows someone else's details, return to the launcher terminal or the new VS Code window and check again. The command checks local wiring. A successful VS Code clone confirms read access, and a successful push confirms write access.
+The first line should show your branch. The fetch and push URLs should point to your private repo in **HAU-6ADET**. The last line should show your own name and commit email. If it shows someone else's details, return to the launcher terminal or the new VS Code window and check again. These commands check local wiring. A successful VS Code clone confirms read access, and a successful push confirms write access.
 
 Use VS Code **Source Control** to commit and push on the lab computer. Check your new commit on GitHub before submitting its URL. At the end of class, close the VS Code window, type `exit` in the launcher terminal or PowerShell window so its temporary credential is removed, and sign out of GitHub in the browser. Your local files remain in the work folder.
 
