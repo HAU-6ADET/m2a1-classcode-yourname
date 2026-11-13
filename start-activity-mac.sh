@@ -29,11 +29,12 @@ ensure_gh() {
         x86_64|amd64) gh_arch=amd64 ;;
         *) printf 'Unsupported Mac architecture: %s\n' "$(uname -m)" >&2; exit 1 ;;
       esac
-      latest_json=$(curl -fsSL -H 'Accept: application/vnd.github+json' https://api.github.com/repos/cli/cli/releases/latest)
-      gh_version=$(printf '%s' "$latest_json" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\([^"]*\)".*/\1/p' | head -n 1)
+      # Read the release from the web redirect, not api.github.com: a lab of Macs
+      # shares one campus IP and exhausts the API's 60-per-hour anonymous limit (403).
+      gh_version=$(curl -fsSI https://github.com/cli/cli/releases/latest 2>/dev/null \
+        | tr -d '\r' | sed -n 's#^[Ll]ocation:.*/tag/v\([0-9][0-9.]*\)$#\1#p' | head -n 1)
       if [[ -z "$gh_version" ]]; then
-        printf '%s\n' 'Could not determine the current GitHub CLI release.' >&2
-        exit 1
+        gh_version=2.104.0
       fi
       download_dir=$(mktemp -d "${TMPDIR:-/tmp}/hau-gh.XXXXXX")
       archive="$download_dir/gh.zip"
